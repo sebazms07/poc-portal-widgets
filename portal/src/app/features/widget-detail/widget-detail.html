@@ -1,0 +1,106 @@
+@if (widget(); as w) {
+  <a class="back" routerLink="/">← Volver al catálogo</a>
+
+  <header class="head">
+    <div class="head__title">
+      <span class="badge" [class.badge--angular]="w.stack === 'angular'"
+            [class.badge--flutter]="w.stack === 'flutter'">{{ w.stack }}</span>
+      <h1>{{ w.name }}</h1>
+    </div>
+    <p class="head__id mono">{{ w.id }}</p>
+    <p class="head__desc">{{ w.description }}</p>
+  </header>
+
+  <div class="layout">
+    <section class="viewer">
+      <div class="viewer__bar">
+        <div class="seg" role="group" aria-label="Ambiente">
+          @for (env of envOrder; track env) {
+            <button type="button" [class.is-active]="isEnv(env)" (click)="selectEnv(env)">
+              {{ env }}
+            </button>
+          }
+        </div>
+
+        @if (w.versions.length) {
+          <select class="select" aria-label="Versión"
+                  (change)="onVersionChange($any($event.target).value)">
+            <option value="" [selected]="selection().kind === 'env'">Versión…</option>
+            @for (v of w.versions; track v.version) {
+              <option [value]="v.version" [selected]="isVersion(v)">
+                v{{ v.version }} · {{ fmtDate(v.releasedAt) }}
+              </option>
+            }
+          </select>
+        }
+
+        <span class="spacer"></span>
+
+        @if (externalUrl(); as href) {
+          <a class="open" [href]="href" target="_blank" rel="noopener">Abrir ↗</a>
+        }
+      </div>
+
+      <div class="viewer__frame">
+        @if (iframeUrl(); as src) {
+          <iframe
+            [src]="src"
+            title="Demo de {{ w.name }}"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            referrerpolicy="no-referrer"></iframe>
+        }
+      </div>
+    </section>
+
+    <aside class="meta">
+      <dl>
+        <dt>Equipo</dt>
+        <dd>{{ w.owner }}</dd>
+
+        <dt>Stack</dt>
+        <dd>{{ w.stack }} {{ w.stackVersion }}</dd>
+
+        <dt>Herramienta</dt>
+        <dd>{{ w.catalogTool }}</dd>
+
+        <dt>Repositorio</dt>
+        <dd><a [href]="w.repo" target="_blank" rel="noopener">{{ w.repo }}</a></dd>
+
+        @if (currentEnvInfo(); as env) {
+          <dt>Deploy actual</dt>
+          <dd>
+            commit <code>{{ env.commit }}</code><br />
+            {{ fmtDate(env.lastDeployed) }} · {{ env.deployedAgo }}
+          </dd>
+        }
+      </dl>
+
+      <div class="tags">
+        @for (tag of w.tags; track tag) {
+          <span class="tag">{{ tag }}</span>
+        }
+      </div>
+
+      <h2 class="meta__h">Versiones publicadas</h2>
+      <ul class="versions">
+        @for (v of w.versions; track v.version) {
+          <li>
+            <button type="button" class="ver" [class.is-active]="isVersion(v)" (click)="selectVersion(v)">
+              <span class="mono">v{{ v.version }}</span>
+              <span class="ver__date">{{ fmtDate(v.releasedAt) }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="versions__empty">Sin versiones publicadas.</li>
+        }
+      </ul>
+    </aside>
+  </div>
+} @else if (status() === 'loading') {
+  <div class="state">Cargando…</div>
+} @else {
+  <div class="state state--empty">
+    <p>No existe un widget con id <code>{{ id() }}</code> en el catálogo.</p>
+    <a routerLink="/">← Volver al catálogo</a>
+  </div>
+}

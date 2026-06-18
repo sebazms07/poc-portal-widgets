@@ -1,0 +1,13 @@
+# Dependencias
+**/node_modules/
+
+# Builds
+**/dist/
+**/.angular/cache/
+
+# Datos generados por el POC (regenerables con los scripts)
+mock-widgets/*/widget.meta.json
+
+# Sistema
+.DS_Store
+Thumbs.db

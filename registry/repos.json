@@ -1,0 +1,15 @@
+{
+  "description": "Lista de repos de widgets que el agregador inspecciona. En produccion son 200+ entradas, una por widget. El campo branch por defecto es 'main'.",
+  "repos": [
+    { "org": "tuorg", "repo": "btn-primary-action" },
+    { "org": "tuorg", "repo": "data-table-pro" },
+    { "org": "tuorg", "repo": "date-picker" },
+    { "org": "tuorg", "repo": "toast-notification" },
+    { "org": "tuorg", "repo": "file-uploader" },
+    { "org": "tuorg", "repo": "flutter-rating-stars" },
+    { "org": "tuorg", "repo": "flutter-bottom-sheet" },
+    { "org": "tuorg", "repo": "flutter-chart-line" },
+    { "org": "tuorg", "repo": "flutter-otp-input" },
+    { "org": "tuorg", "repo": "bad-widget" }
+  ]
+}

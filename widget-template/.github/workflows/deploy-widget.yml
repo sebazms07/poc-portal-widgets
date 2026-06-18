@@ -1,0 +1,127 @@
+name: deploy-widget
+
+# Pipeline que vive en CADA repo de widget. Compila la demo estatica (Angular o
+# Flutter web), la publica en la ruta predecible del hosting, actualiza
+# widget.meta.json con la URL/commit/fecha resultantes y avisa al registry.
+#
+# Mapeo trigger -> ambiente/version:
+#   push a develop  -> dev
+#   push a qa       -> qa
+#   push a main     -> prod
+#   tag vX.Y.Z      -> version inmutable + prod
+on:
+  push:
+    branches: [develop, qa, main]
+    tags: ['v*.*.*']
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # para commitear la actualizacion de widget.meta.json
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---- Determinar id, stack y "target" (dev|qa|prod|vX.Y.Z) -------------
+      - name: Resolver contexto
+        id: ctx
+        run: |
+          ID=$(jq -r '.id' widget.meta.json)
+          STACK=$(jq -r '.stack' widget.meta.json)
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            TARGET="${GITHUB_REF_NAME}"        # ej. v2.1.0
+            ENVIRONMENT="prod"
+          else
+            case "${GITHUB_REF_NAME}" in
+              develop) TARGET="dev"; ENVIRONMENT="dev" ;;
+              qa)      TARGET="qa";  ENVIRONMENT="qa"  ;;
+              main)    TARGET="prod"; ENVIRONMENT="prod" ;;
+            esac
+          fi
+          echo "id=$ID"               >> "$GITHUB_OUTPUT"
+          echo "stack=$STACK"         >> "$GITHUB_OUTPUT"
+          echo "target=$TARGET"       >> "$GITHUB_OUTPUT"
+          echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+
+      # ---- Build Angular ----------------------------------------------------
+      - uses: actions/setup-node@v4
+        if: steps.ctx.outputs.stack == 'angular'
+        with:
+          node-version: 20
+          cache: npm
+      - name: Build Angular
+        if: steps.ctx.outputs.stack == 'angular'
+        run: |
+          npm ci
+          # base-href = la ruta publica donde se sirve, para que los assets resuelvan bien.
+          npx ng build --configuration production \
+            --base-href "/${{ steps.ctx.outputs.id }}/${{ steps.ctx.outputs.target }}/"
+          echo "DIST=dist/$(jq -r '.id' widget.meta.json)/browser" >> "$GITHUB_ENV"
+
+      # ---- Build Flutter web ------------------------------------------------
+      - uses: subosito/flutter-action@v2
+        if: steps.ctx.outputs.stack == 'flutter'
+        with:
+          channel: stable
+      - name: Build Flutter web
+        if: steps.ctx.outputs.stack == 'flutter'
+        run: |
+          flutter pub get
+          flutter build web --release \
+            --base-href "/${{ steps.ctx.outputs.id }}/${{ steps.ctx.outputs.target }}/"
+          echo "DIST=build/web" >> "$GITHUB_ENV"
+
+      # ---- Deploy a Cloudflare Pages (hosting elegido) ----------------------
+      # Publica el build en widgets.tuorg.dev/{id}/{target}/ .
+      - name: Deploy a Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy ${{ env.DIST }}
+            --project-name=widget-catalog
+            --branch=${{ steps.ctx.outputs.id }}-${{ steps.ctx.outputs.target }}
+
+      # ---- Actualizar widget.meta.json y commitear --------------------------
+      - name: Actualizar widget.meta.json
+        run: |
+          ID="${{ steps.ctx.outputs.id }}"
+          TARGET="${{ steps.ctx.outputs.target }}"
+          ENVIRONMENT="${{ steps.ctx.outputs.environment }}"
+          URL="https://widgets.tuorg.dev/${ID}/${TARGET}/"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          SHA="$(git rev-parse --short HEAD)"
+
+          if [[ "$TARGET" == v* ]]; then
+            VERSION="${TARGET#v}"
+            TODAY="$(date -u +%Y-%m-%d)"
+            jq --arg v "$VERSION" --arg u "$URL" --arg d "$TODAY" \
+               '.versions |= ([{version:$v,url:$u,releasedAt:$d,environment:"prod"}] + (map(select(.version != $v))))' \
+               widget.meta.json > tmp && mv tmp widget.meta.json
+          fi
+
+          jq --arg e "$ENVIRONMENT" --arg u "$URL" --arg t "$NOW" --arg c "$SHA" \
+             '.environments[$e] = {url:$u, lastDeployed:$t, commit:$c}' \
+             widget.meta.json > tmp && mv tmp widget.meta.json
+
+          git config user.name  "deploy-bot"
+          git config user.email "deploy-bot@users.noreply.github.com"
+          git add widget.meta.json
+          git commit -m "chore: deploy ${TARGET} [skip ci]" || echo "sin cambios"
+          git push || true
+
+      # ---- Notificar al registry (actualizacion en tiempo real) -------------
+      - name: Notificar al registry
+        run: |
+          curl -sf -X POST \
+            -H "Authorization: Bearer ${{ secrets.REGISTRY_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/tuorg/widget-catalog-registry/dispatches \
+            -d '{"event_type":"widget-deployed","client_payload":{"id":"${{ steps.ctx.outputs.id }}","target":"${{ steps.ctx.outputs.target }}"}}'

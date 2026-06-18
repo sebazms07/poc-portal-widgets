@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://widgets.tuorg.dev/schema/widget.meta.schema.json",
+  "title": "widget.meta.json",
+  "description": "Metadata que cada repo de widget publica y que el registry valida antes de incorporarla al indice central.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "description",
+    "stack",
+    "stackVersion",
+    "repo",
+    "owner",
+    "tags",
+    "catalogTool",
+    "environments",
+    "versions"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 64,
+      "description": "kebab-case, coincide con el nombre del repo, estable en el tiempo."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "stack": {
+      "type": "string",
+      "enum": ["angular", "flutter"]
+    },
+    "stackVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "repo": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 0,
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "catalogTool": {
+      "type": "string",
+      "enum": ["storybook", "widgetbook", "other"]
+    },
+    "environments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dev", "qa", "prod"],
+      "properties": {
+        "dev": { "$ref": "#/$defs/environment" },
+        "qa": { "$ref": "#/$defs/environment" },
+        "prod": { "$ref": "#/$defs/environment" }
+      }
+    },
+    "versions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/version" },
+      "minItems": 0
+    }
+  },
+  "$defs": {
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "lastDeployed", "commit"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "lastDeployed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        }
+      }
+    },
+    "version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "url", "releasedAt", "environment"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "releasedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["dev", "qa", "prod"]
+        }
+      }
+    }
+  }
+}

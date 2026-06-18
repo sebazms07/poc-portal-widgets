@@ -1,0 +1,36 @@
+{
+  "id": "btn-primary-action",
+  "name": "Botón de acción primaria",
+  "description": "Botón reutilizable para acciones primarias del sistema.",
+  "stack": "angular",
+  "stackVersion": "16.2.0",
+  "repo": "https://github.com/tuorg/btn-primary-action",
+  "owner": "team-design-system",
+  "tags": ["button", "core", "forms"],
+  "catalogTool": "storybook",
+  "environments": {
+    "dev": {
+      "url": "https://widgets.tuorg.dev/btn-primary-action/dev/",
+      "lastDeployed": "2026-06-18T14:32:00Z",
+      "commit": "a1b2c3d"
+    },
+    "qa": {
+      "url": "https://widgets.tuorg.dev/btn-primary-action/qa/",
+      "lastDeployed": "2026-06-15T09:10:00Z",
+      "commit": "f4e5d6c"
+    },
+    "prod": {
+      "url": "https://widgets.tuorg.dev/btn-primary-action/prod/",
+      "lastDeployed": "2026-06-10T11:00:00Z",
+      "commit": "9988aab"
+    }
+  },
+  "versions": [
+    {
+      "version": "2.1.0",
+      "url": "https://widgets.tuorg.dev/btn-primary-action/v2.1.0/",
+      "releasedAt": "2026-06-10",
+      "environment": "prod"
+    }
+  ]
+}

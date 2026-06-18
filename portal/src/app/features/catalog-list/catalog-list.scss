@@ -1,0 +1,100 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.search {
+  flex: 1 1 320px;
+  min-width: 220px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 14px;
+}
+.search:focus { outline: 2px solid color-mix(in srgb, var(--c-primary) 45%, transparent); outline-offset: 1px; }
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--c-surface);
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  color: var(--c-muted);
+  padding: 0 16px;
+  height: 42px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.seg button + button { border-left: 1px solid var(--c-border); }
+.seg button.is-active { background: var(--c-primary); color: #fff; }
+
+.select {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 14px;
+}
+
+.tagbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.chip {
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-muted);
+  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.chip.is-active { background: var(--c-primary-weak); color: var(--c-primary); border-color: var(--c-primary); }
+
+.resultbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  color: var(--c-muted);
+  font-size: 13px;
+}
+.link { border: 0; background: none; color: var(--c-primary); cursor: pointer; font-size: 13px; }
+.link:hover { text-decoration: underline; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--c-muted);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+}
+.state--error { color: var(--c-danger); }
+.state--empty { color: var(--c-muted); }
+
+.btn {
+  margin-top: 12px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  cursor: pointer;
+}

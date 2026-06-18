@@ -1,0 +1,104 @@
+/* Design tokens y estilos globales del portal. */
+:root {
+  color-scheme: light dark;
+
+  --c-bg: #f8fafc;
+  --c-surface: #ffffff;
+  --c-surface-2: #f1f5f9;
+  --c-border: #e2e8f0;
+  --c-text: #0f172a;
+  --c-muted: #64748b;
+  --c-muted-2: #94a3b8;
+
+  --c-primary: #4f46e5;
+  --c-primary-weak: #eef2ff;
+  --c-primary-strong: #3730a3;
+
+  --c-angular: #dd0031;
+  --c-angular-weak: #fee2e2;
+  --c-flutter: #0468d7;
+  --c-flutter-weak: #dbeafe;
+
+  --c-ok: #166534;
+  --c-ok-weak: #dcfce7;
+  --c-warn: #854d0e;
+  --c-warn-weak: #fef9c3;
+  --c-info: #075985;
+  --c-info-weak: #e0f2fe;
+  --c-danger: #b91c1c;
+  --c-danger-weak: #fee2e2;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, .10);
+  --maxw: 1200px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #0b1120;
+    --c-surface: #111827;
+    --c-surface-2: #1e293b;
+    --c-border: #1f2a3c;
+    --c-text: #e2e8f0;
+    --c-muted: #94a3b8;
+    --c-muted-2: #64748b;
+    --c-primary-weak: #1e1b4b;
+    --c-angular-weak: #3f1d1d;
+    --c-flutter-weak: #16314f;
+    --c-ok-weak: #14321f;
+    --c-warn-weak: #3a300d;
+    --c-info-weak: #0c2a3a;
+    --c-danger-weak: #3f1d1d;
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, .4);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--c-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1, h2, h3 { margin: 0; line-height: 1.2; }
+
+button { font-family: inherit; }
+
+code, .mono { font-family: var(--mono); font-size: .85em; }
+
+/* Badges reutilizables. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 11px/1 var(--font);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.badge--angular { background: var(--c-angular-weak); color: var(--c-angular); }
+.badge--flutter { background: var(--c-flutter-weak); color: var(--c-flutter); }
+.badge--dev { background: var(--c-info-weak); color: var(--c-info); }
+.badge--qa  { background: var(--c-warn-weak); color: var(--c-warn); }
+.badge--prod{ background: var(--c-ok-weak); color: var(--c-ok); }
+
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }

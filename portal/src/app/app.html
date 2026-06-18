@@ -1,0 +1,30 @@
+<header class="topbar">
+  <div class="container topbar__inner">
+    <a class="brand" routerLink="/">
+      <span class="brand__mark">◆</span>
+      <span class="brand__text">
+        <strong>Catálogo de Widgets</strong>
+        <small>Angular · Flutter — portal in-house</small>
+      </span>
+    </a>
+
+    @if (catalog.status() === 'ready') {
+      <div class="topbar__meta">
+        <span class="badge">{{ catalog.counts().total }} widgets</span>
+        <span class="badge badge--angular">{{ catalog.counts().angular }} angular</span>
+        <span class="badge badge--flutter">{{ catalog.counts().flutter }} flutter</span>
+      </div>
+    }
+  </div>
+</header>
+
+<main class="container app-main">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <div class="container">
+    POC exploratorio · los widgets y sus demos están simulados ·
+    el portal consume <code>catalog-index.json</code> generado por el registry.
+  </div>
+</footer>

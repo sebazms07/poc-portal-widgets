@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Demo widget (simulada)</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: grid; place-items: center; background:
+    radial-gradient(1200px 400px at 50% -10%, #eef2ff, transparent),
+    #ffffff; }
+  .frame { width: min(560px, 92%); padding: 28px; }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .badge { font: 600 11px/1 ui-monospace, monospace; letter-spacing: .04em;
+    padding: 6px 10px; border-radius: 999px; text-transform: uppercase; }
+  .badge.stack { background: #ede9fe; color: #5b21b6; }
+  .badge.angular { background: #fee2e2; color: #b91c1c; }
+  .badge.flutter { background: #dbeafe; color: #1d4ed8; }
+  .badge.env { background: #dcfce7; color: #166534; }
+  .badge.env.qa { background: #fef9c3; color: #854d0e; }
+  .badge.env.dev { background: #e0f2fe; color: #075985; }
+  .badge.ver { background: #f1f5f9; color: #334155; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.desc { margin: 0 0 24px; color: #64748b; font-size: 14px; }
+  .stage { border: 1px dashed #cbd5e1; border-radius: 14px; padding: 28px;
+    display: grid; place-items: center; min-height: 180px; background: #fafafa; }
+  .note { margin-top: 18px; font-size: 11px; color: #94a3b8; text-align: center; }
+
+  /* Widget simulados */
+  .btn { border: 0; border-radius: 10px; padding: 12px 22px; font: 600 15px system-ui;
+    color: #fff; background: #4f46e5; cursor: pointer; box-shadow: 0 4px 14px rgba(79,70,229,.35); }
+  .stars { font-size: 40px; letter-spacing: 6px; color: #f59e0b; }
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table th, .table td { border-bottom: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+  .table th { color: #475569; font-size: 11px; text-transform: uppercase; }
+  .toast { background: #0f172a; color: #fff; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; display: flex; gap: 10px; align-items: center; }
+  .otp { display: flex; gap: 10px; }
+  .otp span { width: 44px; height: 54px; display: grid; place-items: center; font: 700 22px ui-monospace;
+    border: 2px solid #4f46e5; border-radius: 10px; color: #1e293b; }
+  .chart { width: 100%; height: 120px; }
+  .generic { font-size: 48px; }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="badge-row" id="badges"></div>
+    <h1 id="title">Widget</h1>
+    <p class="desc" id="desc"></p>
+    <div class="stage" id="stage"></div>
+    <div class="note">Demo SIMULADA · en produccion este iframe carga el build estatico real publicado en <code>widgets.tuorg.dev</code></div>
+  </div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const id = q.get("id") || "widget";
+  const stack = q.get("stack") || "angular";
+  const env = q.get("env") || "prod";
+  const version = q.get("version") || "";
+  const name = q.get("name") || id;
+
+  document.getElementById("title").textContent = name;
+  document.getElementById("desc").textContent =
+    "Identificador: " + id + (version ? " · version " + version : "");
+
+  const badges = [
+    `<span class="badge stack ${stack}">${stack}</span>`,
+    `<span class="badge env ${env}">${env}</span>`,
+  ];
+  if (version) badges.push(`<span class="badge ver">v${version}</span>`);
+  document.getElementById("badges").innerHTML = badges.join("");
+
+  // Render representativo segun el id del widget.
+  const stage = document.getElementById("stage");
+  const demos = {
+    "btn-primary-action": '<button class="btn">Confirmar accion</button>',
+    "date-picker": '<div class="generic">📅</div>',
+    "toast-notification": '<div class="toast">✅ Cambios guardados correctamente</div>',
+    "file-uploader": '<div class="generic">📤</div>',
+    "data-table-pro": `<table class="table"><tr><th>Nombre</th><th>Estado</th></tr>
+      <tr><td>Pedido 1042</td><td>Activo</td></tr><tr><td>Pedido 1043</td><td>Pendiente</td></tr></table>`,
+    "flutter-rating-stars": '<div class="stars">★★★★☆</div>',
+    "flutter-bottom-sheet": '<div class="generic">🗂️</div>',
+    "flutter-otp-input": '<div class="otp"><span>4</span><span>8</span><span>1</span><span>5</span></div>',
+    "flutter-chart-line": `<svg class="chart" viewBox="0 0 300 120" preserveAspectRatio="none">
+      <polyline fill="none" stroke="#4f46e5" stroke-width="3"
+        points="0,90 50,60 100,75 150,30 200,55 250,20 300,40"/></svg>`,
+  };
+  stage.innerHTML = demos[id] || '<div class="generic">🧩</div>';
+</script>
+</body>
+</html>

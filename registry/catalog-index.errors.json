@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-06-18T21:56:46Z",
+  "totalErrors": 1,
+  "errors": [
+    {
+      "repo": "tuorg/bad-widget",
+      "origin": "..\\mock-widgets\\bad-widget\\widget.meta.json",
+      "reason": "schema-invalid",
+      "details": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "extraneousField"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "/id",
+          "schemaPath": "#/properties/id/minLength",
+          "keyword": "minLength",
+          "params": {
+            "limit": 3
+          },
+          "message": "must NOT have fewer than 3 characters"
+        },
+        {
+          "instancePath": "/stack",
+          "schemaPath": "#/properties/stack/enum",
+          "keyword": "enum",
+          "params": {
+            "allowedValues": [
+              "angular",
+              "flutter"
+            ]
+          },
+          "message": "must be equal to one of the allowed values"
+        },
+        {
+          "instancePath": "/stackVersion",
+          "schemaPath": "#/properties/stackVersion/pattern",
+          "keyword": "pattern",
+          "params": {
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          },
+          "message": "must match pattern \"^\\d+\\.\\d+\\.\\d+$\""
+        },
+        {
+          "instancePath": "/repo",
+          "schemaPath": "#/properties/repo/pattern",
+          "keyword": "pattern",
+          "params": {
+            "pattern": "^https://"
+          },
+          "message": "must match pattern \"^https://\""
+        },
+        {
+          "instancePath": "/environments",
+          "schemaPath": "#/properties/environments/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "qa"
+          },
+          "message": "must have required property 'qa'"
+        },
+        {
+          "instancePath": "/environments",
+          "schemaPath": "#/properties/environments/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "prod"
+          },
+          "message": "must have required property 'prod'"
+        },
+        {
+          "instancePath": "/environments/dev/lastDeployed",
+          "schemaPath": "#/$defs/environment/properties/lastDeployed/format",
+          "keyword": "format",
+          "params": {
+            "format": "date-time"
+          },
+          "message": "must match format \"date-time\""
+        },
+        {
+          "instancePath": "/environments/dev/commit",
+          "schemaPath": "#/$defs/environment/properties/commit/pattern",
+          "keyword": "pattern",
+          "params": {
+            "pattern": "^[0-9a-f]{7,40}$"
+          },
+          "message": "must match pattern \"^[0-9a-f]{7,40}$\""
+        }
+      ]
+    }
+  ]
+}

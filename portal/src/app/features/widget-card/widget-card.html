@@ -1,0 +1,24 @@
+<a class="card" [routerLink]="['/widget', widget().id]">
+  <div class="card__head">
+    <span class="badge" [class.badge--angular]="widget().stack === 'angular'"
+          [class.badge--flutter]="widget().stack === 'flutter'">
+      {{ widget().stack }}
+    </span>
+    <span class="card__ver mono">v{{ latestVersion() }}</span>
+  </div>
+
+  <h3 class="card__name">{{ widget().name }}</h3>
+  <p class="card__id mono">{{ widget().id }}</p>
+  <p class="card__desc">{{ widget().description }}</p>
+
+  <div class="card__tags">
+    @for (tag of widget().tags; track tag) {
+      <span class="tag">{{ tag }}</span>
+    }
+  </div>
+
+  <div class="card__foot">
+    <span class="card__owner">{{ widget().owner }}</span>
+    <span class="card__deploy" title="Último deploy a prod">prod · {{ lastProd() }}</span>
+  </div>
+</a>

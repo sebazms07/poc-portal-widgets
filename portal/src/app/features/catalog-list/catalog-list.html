@@ -1,0 +1,71 @@
+@switch (catalog.status()) {
+  @case ('loading') {
+    <div class="state">Cargando catálogo…</div>
+  }
+
+  @case ('error') {
+    <div class="state state--error">
+      <p>{{ catalog.errorMessage() }}</p>
+      <button type="button" class="btn" (click)="catalog.reload()">Reintentar</button>
+    </div>
+  }
+
+  @case ('ready') {
+    <section class="toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Buscar por nombre, id, descripción, tag u owner…"
+        [value]="query()"
+        (input)="onSearch($any($event.target).value)"
+        aria-label="Buscar widgets" />
+
+      <div class="seg" role="group" aria-label="Filtrar por stack">
+        <button type="button" [class.is-active]="stack() === 'all'" (click)="setStack('all')">
+          Todos
+        </button>
+        <button type="button" [class.is-active]="stack() === 'angular'" (click)="setStack('angular')">
+          Angular
+        </button>
+        <button type="button" [class.is-active]="stack() === 'flutter'" (click)="setStack('flutter')">
+          Flutter
+        </button>
+      </div>
+
+      <select class="select" [value]="owner()" (change)="onOwner($any($event.target).value)"
+              aria-label="Filtrar por equipo">
+        <option value="all">Todos los equipos</option>
+        @for (o of catalog.owners(); track o) {
+          <option [value]="o">{{ o }}</option>
+        }
+      </select>
+    </section>
+
+    <section class="tagbar" aria-label="Filtrar por tags">
+      @for (tag of catalog.tags(); track tag) {
+        <button type="button" class="chip" [class.is-active]="isTagActive(tag)" (click)="toggleTag(tag)">
+          {{ tag }}
+        </button>
+      }
+    </section>
+
+    <div class="resultbar">
+      <span>{{ results().length }} de {{ catalog.counts().total }} widgets</span>
+      @if (hasActiveFilters()) {
+        <button type="button" class="link" (click)="clearFilters()">Limpiar filtros</button>
+      }
+    </div>
+
+    @if (results().length) {
+      <div class="grid">
+        @for (w of results(); track w.id) {
+          <app-widget-card [widget]="w" />
+        }
+      </div>
+    } @else {
+      <div class="state state--empty">
+        Ningún widget coincide con los filtros aplicados.
+      </div>
+    }
+  }
+}

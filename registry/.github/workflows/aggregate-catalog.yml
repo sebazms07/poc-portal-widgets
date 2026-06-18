@@ -1,0 +1,46 @@
+name: aggregate-catalog
+
+# Reconstruye catalog-index.json a partir de los widget.meta.json de cada repo.
+on:
+  schedule:
+    - cron: '*/30 * * * *' # cada 30 min (fallback; lo ideal es repository_dispatch)
+  workflow_dispatch: {} # boton manual en la pestana Actions
+  repository_dispatch:
+    types: [widget-deployed] # cada widget dispara esto tras un deploy exitoso
+
+concurrency:
+  group: aggregate-catalog
+  cancel-in-progress: false # no truncar una corrida a medias
+
+permissions:
+  contents: write # para commitear el indice regenerado
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Agregar y validar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # sube el rate limit de raw/api
+        run: node aggregate-catalog.js --source remote
+
+      - name: Commitear el indice si cambio
+        run: |
+          git config user.name  "catalog-bot"
+          git config user.email "catalog-bot@users.noreply.github.com"
+          git add catalog-index.json catalog-index.errors.json
+          if git diff --staged --quiet; then
+            echo "Sin cambios en el indice; no se genera commit."
+          else
+            git commit -m "chore: actualizar catalog-index [skip ci]"
+            git push
+          fi
