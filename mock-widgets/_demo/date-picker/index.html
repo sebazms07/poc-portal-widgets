@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .cal { width: 320px; padding: 18px; }
+  .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .head .mn { font-weight: 600; font-size: 15px; text-transform: capitalize; }
+  .nav { border: 1px solid var(--border); background: var(--surface); color: var(--text);
+         width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .dow, .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .dow span { text-align: center; font-size: 11px; color: var(--muted-2); padding: 4px 0; text-transform: uppercase; }
+  .day { aspect-ratio: 1; display: grid; place-items: center; border-radius: 9px; font-size: 13px;
+         cursor: pointer; border: 0; background: transparent; color: var(--text); }
+  .day:hover { background: var(--surface-2); }
+  .day.out { color: var(--muted-2); opacity: .5; }
+  .day.today { box-shadow: inset 0 0 0 1.5px var(--primary); color: var(--primary); font-weight: 600; }
+  .day.sel { background: var(--primary); color: #fff; }
+  .day.inrange { background: var(--primary-weak); color: var(--primary); border-radius: 0; }
+  .opts { display: flex; align-items: center; justify-content: space-between; margin-top: 14px;
+          padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }
+  .toggle { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); }
+  .out-val { color: var(--primary); font-weight: 600; }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="cal panel">
+    <div class="head">
+      <button class="nav" id="prev">‹</button>
+      <span class="mn" id="title"></span>
+      <button class="nav" id="next">›</button>
+    </div>
+    <div class="dow"><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span><span>Do</span></div>
+    <div class="days" id="days"></div>
+    <div class="opts">
+      <label class="toggle"><input type="checkbox" id="rangeMode" /> Modo rango</label>
+      <span class="out-val" id="out">—</span>
+    </div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const today = new Date(2026, 5, 18);
+  let view = new Date(2026, 5, 1);
+  let start = null, end = null, rangeMode = false;
+  const $ = (id) => document.getElementById(id);
+  const key = (d) => d.toISOString().slice(0, 10);
+
+  function render() {
+    $('title').textContent = `${MES[view.getMonth()]} ${view.getFullYear()}`;
+    const first = new Date(view.getFullYear(), view.getMonth(), 1);
+    const offset = (first.getDay() + 6) % 7; // lunes = 0
+    const gridStart = new Date(first); gridStart.setDate(1 - offset);
+
+    let html = '';
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(gridStart); d.setDate(gridStart.getDate() + i);
+      const out = d.getMonth() !== view.getMonth();
+      const cls = ['day'];
+      if (out) cls.push('out');
+      if (key(d) === key(today)) cls.push('today');
+      if (start && key(d) === key(start)) cls.push('sel');
+      if (end && key(d) === key(end)) cls.push('sel');
+      if (start && end && d > start && d < end) cls.push('inrange');
+      html += `<button class="${cls.join(' ')}" data-d="${key(d)}">${d.getDate()}</button>`;
+    }
+    $('days').innerHTML = html;
+    $('days').querySelectorAll('.day').forEach((b) => b.addEventListener('click', () => pick(new Date(b.dataset.d))));
+
+    if (!start) $('out').textContent = '—';
+    else if (!rangeMode || !end) $('out').textContent = fmt(start);
+    else $('out').textContent = `${fmt(start)} → ${fmt(end)}`;
+  }
+
+  function pick(d) {
+    if (!rangeMode) { start = d; end = null; }
+    else if (!start || end) { start = d; end = null; }
+    else if (d < start) { end = start; start = d; }
+    else { end = d; }
+    render();
+  }
+  const fmt = (d) => d.toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  $('prev').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render(); });
+  $('next').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render(); });
+  $('rangeMode').addEventListener('change', (e) => { rangeMode = e.target.checked; start = end = null; render(); });
+
+  render();
+</script>
+</body>
+</html>

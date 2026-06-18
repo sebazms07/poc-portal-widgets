@@ -30,23 +30,22 @@ function configure(cfg: PortalConfig): DemoUrlService {
 
 describe('DemoUrlService', () => {
   it('en prod devuelve la URL real del ambiente', () => {
-    const svc = configure({ catalogUrl: '/x', pocMode: false, demoBaseUrl: '/demo/index.html' });
+    const svc = configure({ catalogUrl: '/x', pocMode: false, demoBaseUrl: '/demo' });
     expect(svc.resolve(WIDGET, { kind: 'env', env: 'qa' })).toBe(
       'https://widgets.tuorg.dev/btn-primary-action/qa/',
     );
   });
 
-  it('en POC reescribe a la demo local parametrizada', () => {
-    const svc = configure({ catalogUrl: '/x', pocMode: true, demoBaseUrl: '/demo/index.html' });
+  it('en POC reescribe a la demo local por widget (id en la ruta)', () => {
+    const svc = configure({ catalogUrl: '/x', pocMode: true, demoBaseUrl: '/demo' });
     const url = svc.resolve(WIDGET, { kind: 'version', version: WIDGET.versions[0] });
-    expect(url).toContain('/demo/index.html?');
-    expect(url).toContain('id=btn-primary-action');
+    expect(url).toContain('/demo/btn-primary-action/?');
     expect(url).toContain('version=2.1.0');
     expect(url).toContain('env=prod');
   });
 
   it('realUrl siempre devuelve la URL publicada, incluso en POC', () => {
-    const svc = configure({ catalogUrl: '/x', pocMode: true, demoBaseUrl: '/demo/index.html' });
+    const svc = configure({ catalogUrl: '/x', pocMode: true, demoBaseUrl: '/demo' });
     expect(svc.realUrl(WIDGET, { kind: 'env', env: 'dev' })).toBe(
       'https://widgets.tuorg.dev/btn-primary-action/dev/',
     );

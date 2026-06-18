@@ -33,7 +33,8 @@ export class DemoUrlService {
     if (target.kind === 'version') {
       params.set('version', target.version.version);
     }
-    return `${this.cfg.demoBaseUrl}?${params.toString()}`;
+    // Cada widget tiene su propia demo en /demo/{id}/ (el id va en la ruta, no en query).
+    return `${this.cfg.demoBaseUrl}/${widget.id}/?${params.toString()}`;
   }
 
   /** URL real (no reescrita) para el boton "abrir en nueva pestana". */

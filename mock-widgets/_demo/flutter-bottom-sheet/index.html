@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .phone { position: relative; width: 300px; height: 540px; border-radius: 36px; overflow: hidden;
+           background: linear-gradient(160deg, #6366f1, #4f46e5); box-shadow: var(--shadow);
+           border: 8px solid #0b1020; }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 22px;
+           background: #0b1020; border-radius: 0 0 14px 14px; z-index: 5; }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 14px; color: #fff; text-align: center; padding: 24px; }
+  .screen h3 { margin: 0; font-size: 17px; }
+  .screen p { margin: 0; font-size: 12px; opacity: .85; }
+  .open { border: 0; border-radius: 12px; padding: 11px 18px; font: 600 14px var(--font);
+          background: #fff; color: var(--primary); cursor: pointer; }
+  .backdrop { position: absolute; inset: 0; background: rgba(2,6,23,.5); opacity: 0; pointer-events: none;
+              transition: opacity .2s; z-index: 8; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 88%; background: var(--surface);
+           border-radius: 22px 22px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.25); z-index: 10;
+           transform: translateY(100%); touch-action: none; }
+  .grip { padding: 12px 0 6px; display: grid; place-items: center; cursor: grab; }
+  .grip::before { content: ''; width: 42px; height: 5px; border-radius: 3px; background: var(--border); }
+  .sheet h4 { margin: 0 0 10px; padding: 0 20px; font-size: 15px; }
+  .actions { list-style: none; margin: 0; padding: 0 12px 20px; }
+  .actions li { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; font-size: 14px; cursor: pointer; }
+  .actions li:hover { background: var(--surface-2); }
+  .actions .ic { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px;
+                 background: var(--primary-weak); color: var(--primary); font-size: 17px; }
+  .hint { margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <h3>Tu pedido #1042</h3>
+        <p>Toca el botón para abrir las opciones</p>
+        <button class="open" id="open">Abrir opciones</button>
+      </div>
+      <div class="backdrop" id="backdrop"></div>
+      <section class="sheet" id="sheet">
+        <div class="grip" id="grip"></div>
+        <h4>Acciones del pedido</h4>
+        <ul class="actions">
+          <li><span class="ic">📤</span> Compartir</li>
+          <li><span class="ic">📝</span> Editar pedido</li>
+          <li><span class="ic">🔁</span> Repetir compra</li>
+          <li><span class="ic">📄</span> Descargar factura</li>
+          <li><span class="ic">🚚</span> Seguir envío</li>
+          <li><span class="ic">⛔</span> Cancelar pedido</li>
+        </ul>
+      </section>
+    </div>
+    <div class="hint">Arrastrá el sheet por el tirador · suelta y hace snap a peek / medio / completo</div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const sheet = document.getElementById('sheet');
+  const backdrop = document.getElementById('backdrop');
+  const grip = document.getElementById('grip');
+  const phone = sheet.parentElement;
+
+  let Hs = 0, snaps = [], ty = 0, dragging = false, startY = 0, startTy = 0;
+
+  function measure() {
+    Hs = sheet.offsetHeight;
+    // visibles: cerrado, peek, medio, completo
+    const visibles = [0, 120, 300, Hs];
+    snaps = visibles.map((v) => Hs - v); // translateY por cada snap
+    ty = Hs; // arranca cerrado
+    apply();
+  }
+  function apply() {
+    sheet.style.transform = `translateY(${ty}px)`;
+    const visible = Hs - ty;
+    const o = Math.min(0.55, (visible / Hs) * 0.7);
+    backdrop.style.opacity = o;
+    backdrop.style.pointerEvents = visible > 8 ? 'auto' : 'none';
+  }
+  function animateTo(target) {
+    sheet.style.transition = 'transform .26s cubic-bezier(.2,.8,.2,1)';
+    backdrop.style.transition = 'opacity .26s';
+    ty = target; apply();
+    setTimeout(() => { sheet.style.transition = ''; backdrop.style.transition = ''; }, 280);
+  }
+  function snapNearest() {
+    let best = snaps[0];
+    for (const s of snaps) if (Math.abs(s - ty) < Math.abs(best - ty)) best = s;
+    animateTo(best);
+  }
+
+  document.getElementById('open').addEventListener('click', () => animateTo(snaps[2])); // medio
+  backdrop.addEventListener('click', () => animateTo(snaps[0])); // cerrar
+
+  grip.addEventListener('pointerdown', (e) => {
+    dragging = true; startY = e.clientY; startTy = ty;
+    grip.setPointerCapture(e.pointerId);
+  });
+  grip.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    ty = Math.max(0, Math.min(Hs, startTy + (e.clientY - startY)));
+    apply();
+  });
+  grip.addEventListener('pointerup', () => { dragging = false; snapNearest(); });
+
+  window.addEventListener('resize', measure);
+  measure();
+</script>
+</body>
+</html>

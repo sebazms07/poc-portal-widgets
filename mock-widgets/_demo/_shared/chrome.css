@@ -1,0 +1,127 @@
+/*
+ * Chrome compartido por todas las demos simuladas.
+ * Aporta tokens de "design system" comunes (como compartirían los widgets reales)
+ * + la barra superior con badges de stack/env/versión y la nota al pie.
+ * Cada demo añade su propio <style> con lo específico del widget.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted-2: #94a3b8;
+  --primary: #4f46e5;
+  --primary-weak: #eef2ff;
+  --primary-ink: #ffffff;
+  --ok: #16a34a;
+  --ok-weak: #dcfce7;
+  --warn: #d97706;
+  --warn-weak: #fef3c7;
+  --danger: #dc2626;
+  --danger-weak: #fee2e2;
+  --info: #0284c7;
+  --info-weak: #e0f2fe;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --pill: 999px;
+  --shadow: 0 10px 30px rgba(15, 23, 42, .12);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1120; --surface: #111827; --surface-2: #1e293b; --border: #25304a;
+    --text: #e2e8f0; --muted: #94a3b8; --muted-2: #64748b;
+    --primary-weak: #1e1b4b; --ok-weak: #14321f; --warn-weak: #3a300d;
+    --danger-weak: #3f1d1d; --info-weak: #0c2a3a;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(1100px 380px at 50% -8%, color-mix(in srgb, var(--primary) 12%, transparent), transparent),
+    var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Barra superior */
+.demo-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: saturate(160%) blur(6px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.dc-name { font-weight: 600; font-size: 14px; }
+.dc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.dc-badge {
+  font: 700 10px/1 var(--font);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-radius: var(--pill);
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.dc-angular { background: #fee2e2; color: #b91c1c; }
+.dc-flutter { background: #dbeafe; color: #1d4ed8; }
+.dc-env.dc-dev { background: var(--info-weak); color: var(--info); }
+.dc-env.dc-qa { background: var(--warn-weak); color: var(--warn); }
+.dc-env.dc-prod { background: var(--ok-weak); color: var(--ok); }
+.dc-ver { background: var(--primary-weak); color: var(--primary); }
+
+/* Escenario donde vive el widget */
+.demo-stage {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 28px 20px;
+}
+
+/* Nota al pie */
+.demo-note {
+  padding: 10px 16px;
+  font-size: 11px;
+  color: var(--muted-2);
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+/* Utilidades comunes a los widgets */
+.panel {
+  width: min(640px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.btn {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font: 600 14px var(--font);
+  cursor: pointer;
+  background: var(--surface-2);
+  color: var(--text);
+  transition: transform .08s ease, filter .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--primary); color: var(--primary-ink); }
+.btn-primary:hover { filter: brightness(1.07); }

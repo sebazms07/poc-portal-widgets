@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .up { width: min(520px, 100%); padding: 22px; }
+  .drop { border: 2px dashed var(--border); border-radius: 14px; padding: 30px 20px; text-align: center;
+          color: var(--muted); transition: border-color .15s, background .15s; cursor: pointer; }
+  .drop.over { border-color: var(--primary); background: var(--primary-weak); color: var(--primary); }
+  .drop .big { font-size: 30px; }
+  .drop .browse { color: var(--primary); font-weight: 600; }
+  .hint { font-size: 11px; color: var(--muted-2); margin-top: 4px; }
+  .files { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .file { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border);
+          border-radius: 11px; background: var(--surface); }
+  .file .ico { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 8px;
+               background: var(--surface-2); font-size: 16px; }
+  .file .info { flex: 1; min-width: 0; }
+  .file .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file .sub { font-size: 11px; color: var(--muted); }
+  .file .sub.err { color: var(--danger); }
+  .track { height: 5px; background: var(--surface-2); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .track > i { display: block; height: 100%; width: 0; background: var(--primary); transition: width .2s; }
+  .file.done .track > i { background: var(--ok); }
+  .file.error .track > i { background: var(--danger); }
+  .file .x { border: 0; background: none; color: var(--muted-2); cursor: pointer; font-size: 16px; }
+  .row { display: flex; gap: 10px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="up panel">
+    <div class="drop" id="drop">
+      <div class="big">📤</div>
+      <div>Arrastrá archivos o <span class="browse">examiná</span></div>
+      <div class="hint">PDF, PNG, JPG, DOCX · máx 5 MB · .exe rechazado</div>
+    </div>
+    <ul class="files" id="files"></ul>
+    <div class="row">
+      <button class="btn btn-primary" id="add">Simular subida</button>
+      <button class="btn" id="addBad">Simular archivo inválido</button>
+    </div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const POOL = [
+    { name: 'contrato-2026.pdf', ico: '📄', size: 1.8 },
+    { name: 'logo-marca.png', ico: '🖼️', size: 0.6 },
+    { name: 'presupuesto.xlsx', ico: '📊', size: 2.4 },
+    { name: 'foto-perfil.jpg', ico: '🖼️', size: 3.1 },
+    { name: 'informe.docx', ico: '📝', size: 1.2 },
+  ];
+  const list = document.getElementById('files');
+
+  function addFile(f, invalid) {
+    const li = document.createElement('li');
+    li.className = 'file';
+    li.innerHTML = `
+      <span class="ico">${f.ico}</span>
+      <div class="info">
+        <div class="name">${f.name}</div>
+        <div class="sub">${f.size.toFixed(1)} MB · <span class="state">${invalid ? 'validando…' : 'subiendo…'}</span></div>
+        <div class="track"><i></i></div>
+      </div>
+      <button class="x">×</button>`;
+    list.prepend(li);
+    li.querySelector('.x').addEventListener('click', () => li.remove());
+    const bar = li.querySelector('i');
+    const sub = li.querySelector('.sub');
+    const state = li.querySelector('.state');
+
+    if (invalid) {
+      setTimeout(() => {
+        li.classList.add('error'); bar.style.width = '100%';
+        sub.classList.add('err'); state.textContent = 'Tipo no permitido (.exe)';
+      }, 500);
+      return;
+    }
+    let p = 0;
+    const t = setInterval(() => {
+      p += Math.random() * 22 + 8;
+      if (p >= 100) { p = 100; clearInterval(t); li.classList.add('done'); state.textContent = '✓ Completado'; }
+      else state.textContent = Math.round(p) + '%';
+      bar.style.width = p + '%';
+    }, 240);
+  }
+
+  let i = 0;
+  document.getElementById('add').addEventListener('click', () => addFile(POOL[i++ % POOL.length], false));
+  document.getElementById('addBad').addEventListener('click', () => addFile({ name: 'instalador.exe', ico: '⚙️', size: 12.5 }, true));
+
+  const drop = document.getElementById('drop');
+  drop.addEventListener('click', () => addFile(POOL[i++ % POOL.length], false));
+  ['dragenter', 'dragover'].forEach((e) => drop.addEventListener(e, (ev) => { ev.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((e) => drop.addEventListener(e, (ev) => { ev.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', () => addFile(POOL[i++ % POOL.length], false));
+</script>
+</body>
+</html>

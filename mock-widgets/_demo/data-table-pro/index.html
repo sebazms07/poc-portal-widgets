@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .grid { width: min(760px, 100%); padding: 16px; }
+  .bar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .search { flex: 1 1 200px; height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: 9px; background: var(--surface-2); color: var(--text); font-size: 13px; }
+  .sel-info { font-size: 12px; color: var(--primary); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+       cursor: pointer; user-select: none; }
+  th.num, td.num { text-align: right; }
+  th .arrow { color: var(--primary); font-size: 10px; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.amount { font-variant-numeric: tabular-nums; }
+  .pill { font: 600 11px var(--font); padding: 3px 9px; border-radius: var(--pill); }
+  .pill.activo { background: var(--ok-weak); color: var(--ok); }
+  .pill.pendiente { background: var(--warn-weak); color: var(--warn); }
+  .pill.cancelado { background: var(--danger-weak); color: var(--danger); }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .pager { display: flex; gap: 6px; align-items: center; }
+  .pager button { border: 1px solid var(--border); background: var(--surface); color: var(--text);
+                  border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+  .pager button[disabled] { opacity: .4; cursor: not-allowed; }
+  input[type=checkbox] { accent-color: var(--primary); width: 15px; height: 15px; }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="grid panel">
+    <div class="bar">
+      <input class="search" id="q" placeholder="Filtrar pedidos…" />
+      <span class="sel-info" id="selInfo"></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34px"><input type="checkbox" id="all" /></th>
+          <th data-k="id">Pedido</th>
+          <th data-k="cliente">Cliente</th>
+          <th data-k="monto" class="num">Monto</th>
+          <th data-k="estado">Estado</th>
+          <th data-k="fecha">Fecha</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="foot">
+      <span id="count"></span>
+      <div class="pager">
+        <button id="prev">‹</button>
+        <span id="page"></span>
+        <button id="next">›</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const clientes = ['Acme S.A.', 'Globex', 'Initech', 'Umbrella', 'Soylent', 'Stark Ind.', 'Wayne Co.', 'Wonka', 'Hooli', 'Pied Piper'];
+  const estados = ['activo', 'pendiente', 'cancelado'];
+  const data = Array.from({ length: 23 }, (_, i) => ({
+    id: 1042 + i,
+    cliente: clientes[i % clientes.length],
+    monto: Math.round((Math.random() * 9000 + 200)),
+    estado: estados[i % 3],
+    fecha: new Date(2026, 5, 18 - (i % 28)).toISOString().slice(0, 10),
+  }));
+
+  const selected = new Set();
+  let sortKey = 'id', sortDir = 1, page = 0, q = '';
+  const SIZE = 6;
+  const $ = (id) => document.getElementById(id);
+
+  function filtered() {
+    const t = q.toLowerCase();
+    let rows = data.filter((r) => !t || `${r.id} ${r.cliente} ${r.estado} ${r.monto}`.toLowerCase().includes(t));
+    rows.sort((a, b) => {
+      const av = a[sortKey], bv = b[sortKey];
+      return (av > bv ? 1 : av < bv ? -1 : 0) * sortDir;
+    });
+    return rows;
+  }
+
+  function render() {
+    const rows = filtered();
+    const pages = Math.max(1, Math.ceil(rows.length / SIZE));
+    page = Math.min(page, pages - 1);
+    const slice = rows.slice(page * SIZE, page * SIZE + SIZE);
+
+    $('rows').innerHTML = slice.map((r) => `
+      <tr>
+        <td><input type="checkbox" data-id="${r.id}" ${selected.has(r.id) ? 'checked' : ''}></td>
+        <td>#${r.id}</td>
+        <td>${r.cliente}</td>
+        <td class="num amount">$${r.monto.toLocaleString('es')}</td>
+        <td><span class="pill ${r.estado}">${r.estado}</span></td>
+        <td>${r.fecha}</td>
+      </tr>`).join('');
+
+    $('rows').querySelectorAll('input[type=checkbox]').forEach((c) =>
+      c.addEventListener('change', () => {
+        const id = +c.dataset.id;
+        c.checked ? selected.add(id) : selected.delete(id);
+        updateSel();
+      }));
+
+    document.querySelectorAll('th[data-k]').forEach((th) => {
+      const k = th.dataset.k;
+      th.innerHTML = th.textContent.replace(/ [▲▼]$/, '') + (k === sortKey ? ` <span class="arrow">${sortDir > 0 ? '▲' : '▼'}</span>` : '');
+    });
+
+    $('count').textContent = `${rows.length} pedidos`;
+    $('page').textContent = `${page + 1} / ${pages}`;
+    $('prev').disabled = page === 0;
+    $('next').disabled = page >= pages - 1;
+    updateSel();
+  }
+
+  function updateSel() {
+    $('selInfo').textContent = selected.size ? `${selected.size} seleccionado${selected.size > 1 ? 's' : ''}` : '';
+  }
+
+  document.querySelectorAll('th[data-k]').forEach((th) =>
+    th.addEventListener('click', () => {
+      const k = th.dataset.k;
+      if (k === sortKey) sortDir *= -1; else { sortKey = k; sortDir = 1; }
+      render();
+    }));
+  $('q').addEventListener('input', (e) => { q = e.target.value; page = 0; render(); });
+  $('prev').addEventListener('click', () => { page--; render(); });
+  $('next').addEventListener('click', () => { page++; render(); });
+  $('all').addEventListener('change', (e) => {
+    filtered().slice(page * SIZE, page * SIZE + SIZE).forEach((r) =>
+      e.target.checked ? selected.add(r.id) : selected.delete(r.id));
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

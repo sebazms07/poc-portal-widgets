@@ -29,5 +29,7 @@ export const APP_CONFIG = new InjectionToken<PortalConfig>('PORTAL_CONFIG');
 export const POC_CONFIG: PortalConfig = {
   catalogUrl: '/catalog-index.json',
   pocMode: true,
-  demoBaseUrl: '/demo/index.html',
+  // Base de las demos locales: cada widget tiene la suya en /demo/{id}/,
+  // mimetizando el build por-widget de producción en {id}/{target}/.
+  demoBaseUrl: '/demo',
 };

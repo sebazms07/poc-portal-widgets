@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .otp { width: min(420px, 100%); padding: 28px; text-align: center; }
+  .otp h2 { font-size: 18px; margin: 0 0 4px; }
+  .otp p { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+  .boxes { display: flex; gap: 10px; justify-content: center; }
+  .boxes input { width: 46px; height: 56px; text-align: center; font: 700 24px var(--mono);
+                 border: 2px solid var(--border); border-radius: 12px; background: var(--surface-2);
+                 color: var(--text); transition: border-color .15s, background .15s; }
+  .boxes input:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+  .ok .boxes input { border-color: var(--ok); color: var(--ok); }
+  .err .boxes input { border-color: var(--danger); color: var(--danger); }
+  .err .boxes { animation: shake .35s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+  .status { min-height: 20px; margin-top: 16px; font-size: 13px; font-weight: 600; }
+  .ok .status { color: var(--ok); } .err .status { color: var(--danger); }
+  .resend { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .resend button { border: 0; background: none; color: var(--primary); font-weight: 600; cursor: pointer; }
+  .resend button[disabled] { color: var(--muted-2); cursor: not-allowed; }
+  .hint { margin-top: 18px; font-size: 11px; color: var(--muted-2); }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="otp panel" id="root">
+    <h2>Verificá tu identidad</h2>
+    <p>Ingresá el código de 6 dígitos que enviamos a tu teléfono</p>
+    <div class="boxes" id="boxes"></div>
+    <div class="status" id="status"></div>
+    <div class="resend">¿No llegó? <button id="resend"></button></div>
+    <div class="hint">Pista para la demo: el código válido es <b>481572</b> (probá pegar 6 dígitos)</div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const N = 6, CODE = '481572';
+  const boxes = document.getElementById('boxes');
+  const root = document.getElementById('root');
+  const status = document.getElementById('status');
+  const inputs = [];
+
+  for (let i = 0; i < N; i++) {
+    const inp = document.createElement('input');
+    inp.maxLength = 1; inp.inputMode = 'numeric'; inp.autocomplete = 'one-time-code';
+    boxes.appendChild(inp); inputs.push(inp);
+
+    inp.addEventListener('input', () => {
+      reset();
+      inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
+      if (inp.value && i < N - 1) inputs[i + 1].focus();
+      check();
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus();
+      if (e.key === 'ArrowLeft' && i > 0) inputs[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < N - 1) inputs[i + 1].focus();
+    });
+    inp.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, N);
+      reset();
+      digits.split('').forEach((d, k) => { if (inputs[k]) inputs[k].value = d; });
+      (inputs[Math.min(digits.length, N - 1)]).focus();
+      check();
+    });
+  }
+
+  function value() { return inputs.map((i) => i.value).join(''); }
+  function reset() { root.classList.remove('ok', 'err'); status.textContent = ''; }
+  function check() {
+    const v = value();
+    if (v.length < N) return;
+    if (v === CODE) { root.classList.add('ok'); status.textContent = '✓ Código verificado'; }
+    else { root.classList.add('err'); status.textContent = 'Código incorrecto, intentá de nuevo'; }
+  }
+
+  // Reenvío con cuenta regresiva
+  const resend = document.getElementById('resend');
+  let left = 0, timer;
+  function startCountdown() {
+    left = 30; tick();
+    timer = setInterval(() => { left--; tick(); if (left <= 0) clearInterval(timer); }, 1000);
+  }
+  function tick() {
+    if (left > 0) { resend.disabled = true; resend.textContent = `Reenviar en ${left}s`; }
+    else { resend.disabled = false; resend.textContent = 'Reenviar código'; }
+  }
+  resend.addEventListener('click', () => { if (left <= 0) { inputs.forEach((i) => i.value = ''); reset(); inputs[0].focus(); startCountdown(); } });
+
+  inputs[0].focus();
+  startCountdown();
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .rate { width: min(440px, 100%); padding: 28px; text-align: center; }
+  .stars { display: inline-flex; gap: 6px; cursor: pointer; }
+  .star { position: relative; width: 42px; height: 42px; color: #d8dee9; }
+  .star svg { width: 100%; height: 100%; }
+  .star .fill { position: absolute; inset: 0; overflow: hidden; width: 0; color: #f59e0b; }
+  .star .fill svg { width: 42px; height: 42px; }
+  .value { font-size: 30px; font-weight: 700; margin-top: 16px; }
+  .value small { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .reviews { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .opts { display: flex; gap: 16px; justify-content: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .opts label { display: inline-flex; gap: 6px; align-items: center; }
+  .ro .stars { cursor: default; }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="rate panel" id="root">
+    <div class="stars" id="stars"></div>
+    <div class="value"><span id="num">3.5</span><small> / 5</small></div>
+    <div class="reviews" id="reviews">basado en 1.284 reseñas</div>
+    <div class="opts">
+      <label><input type="checkbox" id="ro" /> Solo lectura</label>
+      <label><input type="checkbox" id="half" checked /> Medias estrellas</label>
+    </div>
+  </div>
+</main>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const PATH = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.8 1.6 7z"/></svg>';
+  const MAX = 5;
+  let value = 3.5, readonly = false, allowHalf = true;
+  const stars = document.getElementById('stars');
+  const root = document.getElementById('root');
+
+  for (let i = 0; i < MAX; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.innerHTML = PATH + `<div class="fill">${PATH}</div>`;
+    stars.appendChild(s);
+  }
+  const cells = [...stars.children];
+
+  function paint(v) {
+    cells.forEach((c, i) => {
+      const f = Math.max(0, Math.min(1, v - i));
+      c.querySelector('.fill').style.width = (f * 100) + '%';
+    });
+    document.getElementById('num').textContent = v.toFixed(1);
+  }
+
+  function valueAt(e, i) {
+    const r = cells[i].getBoundingClientRect();
+    const half = allowHalf && (e.clientX - r.left) < r.width / 2;
+    return i + (half ? 0.5 : 1);
+  }
+
+  cells.forEach((c, i) => {
+    c.addEventListener('mousemove', (e) => { if (!readonly) paint(valueAt(e, i)); });
+    c.addEventListener('click', (e) => { if (!readonly) { value = valueAt(e, i); paint(value); } });
+  });
+  stars.addEventListener('mouseleave', () => paint(value));
+
+  document.getElementById('ro').addEventListener('change', (e) => { readonly = e.target.checked; root.classList.toggle('ro', readonly); });
+  document.getElementById('half').addEventListener('change', (e) => { allowHalf = e.target.checked; });
+
+  paint(value);
+</script>
+</body>
+</html>

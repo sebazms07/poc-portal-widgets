@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../_shared/chrome.css" />
+<style>
+  .panel-demo { width: min(560px, 100%); padding: 26px; text-align: center; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .controls button { border: 0; border-radius: 10px; padding: 10px 16px; font: 600 13px var(--font); cursor: pointer; color: #fff; }
+  .c-success { background: var(--ok); } .c-info { background: var(--info); }
+  .c-warning { background: var(--warn); } .c-error { background: var(--danger); }
+  .c-multi { background: var(--primary); }
+  .stack { position: fixed; top: 56px; right: 16px; display: flex; flex-direction: column; gap: 10px;
+           z-index: 100; width: 300px; max-width: calc(100% - 32px); }
+  .toast { background: var(--surface); border: 1px solid var(--border); border-left-width: 4px;
+           border-radius: 12px; box-shadow: var(--shadow); padding: 12px 14px; display: flex; gap: 10px;
+           align-items: flex-start; overflow: hidden; position: relative;
+           animation: slidein .25s cubic-bezier(.2,.8,.2,1); }
+  .toast.out { animation: slideout .25s ease forwards; }
+  @keyframes slidein { from { transform: translateX(120%); opacity: 0; } }
+  @keyframes slideout { to { transform: translateX(120%); opacity: 0; } }
+  .toast .ico { font-size: 16px; line-height: 1.4; }
+  .toast .body { flex: 1; font-size: 13px; }
+  .toast .title { font-weight: 600; }
+  .toast .msg { color: var(--muted); font-size: 12px; }
+  .toast .x { border: 0; background: none; color: var(--muted-2); cursor: pointer; font-size: 16px; }
+  .toast .prog { position: absolute; left: 0; bottom: 0; height: 3px; background: currentColor; opacity: .5; }
+  .s-success { border-left-color: var(--ok); color: var(--ok); }
+  .s-info { border-left-color: var(--info); color: var(--info); }
+  .s-warning { border-left-color: var(--warn); color: var(--warn); }
+  .s-error { border-left-color: var(--danger); color: var(--danger); }
+</style>
+</head>
+<body>
+<header id="demo-chrome"></header>
+<main class="demo-stage">
+  <div class="panel-demo panel">
+    <div class="controls">
+      <button class="c-success" data-t="success">Éxito</button>
+      <button class="c-info" data-t="info">Info</button>
+      <button class="c-warning" data-t="warning">Advertencia</button>
+      <button class="c-error" data-t="error">Error</button>
+      <button class="c-multi" data-t="multi">Disparar varios</button>
+    </div>
+  </div>
+</main>
+<div class="stack" id="stack"></div>
+<footer id="demo-note"></footer>
+<script src="../_shared/chrome.js"></script>
+<script>
+  const META = {
+    success: { ico: '✅', title: 'Cambios guardados', msg: 'Tu información se actualizó correctamente.' },
+    info:    { ico: 'ℹ️', title: 'Sincronización', msg: 'Nuevos datos disponibles para revisar.' },
+    warning: { ico: '⚠️', title: 'Sesión por expirar', msg: 'Guardá tus cambios antes de 5 minutos.' },
+    error:   { ico: '⛔', title: 'No se pudo conectar', msg: 'Reintentá en unos segundos.' },
+  };
+  const stack = document.getElementById('stack');
+
+  function toast(type) {
+    const m = META[type];
+    const el = document.createElement('div');
+    el.className = `toast s-${type}`;
+    el.innerHTML = `
+      <span class="ico">${m.ico}</span>
+      <div class="body"><div class="title">${m.title}</div><div class="msg">${m.msg}</div></div>
+      <button class="x">×</button>
+      <span class="prog"></span>`;
+    stack.appendChild(el);
+    const prog = el.querySelector('.prog');
+    const DUR = 4200;
+    prog.style.transition = `width ${DUR}ms linear`;
+    prog.style.width = '100%';
+    requestAnimationFrame(() => { prog.style.width = '0%'; });
+    const timer = setTimeout(() => remove(el), DUR);
+    el.querySelector('.x').addEventListener('click', () => { clearTimeout(timer); remove(el); });
+  }
+  function remove(el) { el.classList.add('out'); setTimeout(() => el.remove(), 250); }
+
+  document.querySelectorAll('.controls button').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (b.dataset.t === 'multi') ['success', 'info', 'warning', 'error'].forEach((t, i) => setTimeout(() => toast(t), i * 250));
+      else toast(b.dataset.t);
+    }));
+</script>
+</body>
+</html>
