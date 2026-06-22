@@ -6,13 +6,18 @@
   --c-surface: #ffffff;
   --c-surface-2: #f1f5f9;
   --c-border: #e2e8f0;
-  --c-text: #0f172a;
+  --c-text: #2c2a29;
   --c-muted: #64748b;
   --c-muted-2: #94a3b8;
 
-  --c-primary: #4f46e5;
-  --c-primary-weak: #eef2ff;
-  --c-primary-strong: #3730a3;
+  /* Bancolombia: fucsia = interacción/seleccionado (legible como texto y con texto blanco encima). */
+  --c-primary: #cc0066;
+  --c-primary-weak: #fde7f1;
+  --c-primary-strong: #99004d;
+  /* Bancolombia: amarillo = CTA/marca, SIEMPRE con texto carbón. */
+  --c-cta: #fdda24;
+  --c-cta-strong: #e6c200;
+  --c-cta-ink: #2c2a29;
 
   --c-angular: #dd0031;
   --c-angular-weak: #fee2e2;
@@ -47,7 +52,7 @@
     --c-text: #e2e8f0;
     --c-muted: #94a3b8;
     --c-muted-2: #64748b;
-    --c-primary-weak: #1e1b4b;
+    --c-primary-weak: #3d0a26;
     --c-angular-weak: #3f1d1d;
     --c-flutter-weak: #16314f;
     --c-ok-weak: #14321f;

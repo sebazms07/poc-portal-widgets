@@ -91,10 +91,12 @@
 
 .btn {
   margin-top: 12px;
-  border: 1px solid var(--c-border);
-  background: var(--c-surface-2);
-  color: var(--c-text);
+  border: 0;
+  background: var(--c-cta);
+  color: var(--c-cta-ink);
+  font-weight: 600;
   border-radius: var(--radius-sm);
   padding: 8px 16px;
   cursor: pointer;
 }
+.btn:hover { background: var(--c-cta-strong); }

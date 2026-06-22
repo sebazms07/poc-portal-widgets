@@ -1,30 +1,48 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Paleta de marca Bancolombia.
+ * - Fucsia (#cc0066): color interactivo/primario de Infima (links, activos, botones).
+ *   Legible como texto sobre blanco y con texto blanco sobre fucsia.
+ * - Amarillo (#fdda24): CTAs y marca, SIEMPRE con texto carbón.
+ * - Carbón (#2c2a29): texto base.
  */
-
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #cc0066;
+  --ifm-color-primary-dark: #b8005c;
+  --ifm-color-primary-darker: #ad0056;
+  --ifm-color-primary-darkest: #8f0047;
+  --ifm-color-primary-light: #e60073;
+  --ifm-color-primary-lighter: #f00078;
+  --ifm-color-primary-lightest: #ff1a8c;
+  --ifm-font-color-base: #2c2a29;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Marca Bancolombia */
+  --ban-yellow: #fdda24;
+  --ban-yellow-strong: #e6c200;
+  --ban-ink: #2c2a29;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* En modo oscuro, un fucsia más brillante para contraste. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #ff66ad;
+  --ifm-color-primary-dark: #ff4d9f;
+  --ifm-color-primary-darker: #ff4099;
+  --ifm-color-primary-darkest: #ff1a85;
+  --ifm-color-primary-light: #ff80bb;
+  --ifm-color-primary-lighter: #ff8dc2;
+  --ifm-color-primary-lightest: #ffb3d6;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Botón CTA amarillo de marca (homepage, etc.). */
+.button--bancolombia {
+  background-color: var(--ban-yellow);
+  border-color: var(--ban-yellow);
+  color: var(--ban-ink);
+}
+.button--bancolombia:hover {
+  background-color: var(--ban-yellow-strong);
+  border-color: var(--ban-yellow-strong);
+  color: var(--ban-ink);
 }

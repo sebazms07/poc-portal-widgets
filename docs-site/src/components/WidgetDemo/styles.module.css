@@ -45,12 +45,14 @@
 }
 .open {
   font-size: 13px;
+  font-weight: 600;
   padding: 6px 12px;
-  border: 1px solid var(--ifm-color-emphasis-300);
+  border: 1px solid var(--ban-yellow);
   border-radius: 8px;
-  background: var(--ifm-background-color);
+  background: var(--ban-yellow);
+  color: var(--ban-ink);
 }
-.open:hover { text-decoration: none; border-color: var(--ifm-color-primary); }
+.open:hover { text-decoration: none; background: var(--ban-yellow-strong); border-color: var(--ban-yellow-strong); color: var(--ban-ink); }
 .frame {
   display: block;
   width: 100%;

@@ -13,8 +13,8 @@
   .b { border: 0; border-radius: 10px; font: 600 14px var(--font); cursor: pointer; display: inline-flex;
        align-items: center; gap: 8px; transition: transform .08s, filter .15s, box-shadow .15s; }
   .b:active { transform: translateY(1px); }
-  .b.primary { background: var(--primary); color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 35%, transparent); }
-  .b.primary:hover { filter: brightness(1.08); }
+  .b.primary { background: var(--brand-yellow); color: var(--brand-ink); box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-yellow) 45%, transparent); }
+  .b.primary:hover { filter: brightness(1.04); }
   .b.secondary { background: var(--surface-2); color: var(--text); }
   .b.outline { background: transparent; color: var(--primary); box-shadow: inset 0 0 0 1.5px var(--primary); }
   .b.ghost { background: transparent; color: var(--primary); }
@@ -24,7 +24,7 @@
   .b.sm { padding: 7px 12px; font-size: 12px; }
   .b.md { padding: 10px 16px; }
   .b.lg { padding: 14px 22px; font-size: 16px; }
-  .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+  .spinner { width: 15px; height: 15px; border: 2px solid rgba(44,42,41,.25); border-top-color: var(--brand-ink);
              border-radius: 50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .toggle { margin-left: auto; display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
