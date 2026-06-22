@@ -1,0 +1,64 @@
+.demo {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1rem 0 1.5rem;
+  background: var(--ifm-background-surface-color);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+}
+.spacer { flex: 1; }
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ifm-background-color);
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.seg button + button { border-left: 1px solid var(--ifm-color-emphasis-300); }
+.seg button.active,
+.active { background: var(--ifm-color-primary); color: #fff; }
+.select {
+  height: 32px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  font-size: 13px;
+  padding: 0 8px;
+}
+.open {
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-color);
+}
+.open:hover { text-decoration: none; border-color: var(--ifm-color-primary); }
+.frame {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+.state {
+  padding: 28px;
+  text-align: center;
+  color: var(--ifm-color-emphasis-600);
+}

@@ -1,0 +1,54 @@
+name: update-catalog-docs
+
+# Regenera la base de información del sitio y lo republica.
+# El catálogo en runtime (/catalog) NO necesita esto; esto es para las páginas
+# MDX por widget (búsqueda/deep-link) y para refrescar el índice publicado.
+on:
+  repository_dispatch:
+    types: [widget-deployed] # mismo evento que ya emite cada deploy-widget.yml
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 * * * *' # red de seguridad (1/h); lo ideal es solo dispatch
+
+concurrency:
+  group: update-catalog-docs
+  cancel-in-progress: true # coalescing: si llegan varios deploys juntos, basta el último
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # El sitio vive en docs-site/ pero el generador lee ../registry y
+          # ../mock-widgets, así que necesitamos todo el repo.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+
+      # En producción, en vez de leer mock-widgets, acá se bajaría el
+      # catalog-index.json publicado por el registry. Para la POC se usa el local.
+      - name: Build (regenera docs desde el catálogo)
+        working-directory: docs-site
+        run: |
+          npm ci
+          npm run build   # prebuild ejecuta generate-catalog-docs.mjs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs-site/build
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

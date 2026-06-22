@@ -65,6 +65,12 @@ pocPortalWidgets/
 │   ├── src/app/core/        modelos, CatalogService, DemoUrlService, config
 │   ├── src/app/features/    catalog-list, widget-card, widget-detail
 │   └── sync-assets.mjs      glue del POC: copia índice + demo a public/
+├── docs-site/           # ★ POC alternativa en Docusaurus (docs + catálogo + búsqueda)
+│   ├── src/lib/catalog.ts             useCatalog() runtime + helpers
+│   ├── src/components/                WidgetCatalog, WidgetDemo (demo embebida)
+│   ├── src/pages/catalog.tsx          /catalog
+│   ├── scripts/generate-catalog-docs.mjs   genera static/ + docs/widgets/*.mdx
+│   └── .github/workflows/update-catalog-docs.yml
 ├── registry/            # Repo "registry": agrega y valida
 │   ├── aggregate-catalog.js
 │   ├── widget.meta.schema.json
@@ -77,10 +83,15 @@ pocPortalWidgets/
 │   └── .github/workflows/deploy-widget.yml
 ├── mock-widgets/        # Datos simulados del POC
 │   ├── _generate-mock-widgets.js    genera N widget.meta.json
-│   ├── _demo/index.html             demo parametrizada que cargan los iframes
+│   ├── _demo/_shared/               chrome común de las demos (badges env/versión)
+│   ├── _demo/<id>/index.html        una demo interactiva por widget (cargan los iframes)
 │   └── <id>/widget.meta.json        (generados)
 └── docs/ARCHITECTURE.md
 ```
+
+> **Dos front-ends, un mismo backend de datos.** `portal/` (Angular) y `docs-site/`
+> (Docusaurus) consumen el **mismo** `catalog-index.json`. El segundo suma
+> documentación escrita y búsqueda; ver [`docs-site/README.md`](docs-site/README.md).
 
 ---
 
